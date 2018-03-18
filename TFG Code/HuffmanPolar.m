@@ -42,13 +42,10 @@ if(plots)
     figure
     histogram(modulatedSignalInv,histoEdges)
 
-
-    histoEdges = 0.5:length(intervalVector)+0.5;
     nCounts = histcounts(modulatedSignal,histoEdges);
     totalCount = sum(nCounts);
     modulatedProbability = nCounts/totalCount;
     dict = huffmandict(1:length(intervalVector),modulatedProbability);
-
 
     errorsVector = [abs(tmwavesformP - tmwaveform2),modulatedSignal];
     errorsHist = zeros(length(dict),1);

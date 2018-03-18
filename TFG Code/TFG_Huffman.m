@@ -1,7 +1,7 @@
 %% 
 % Variables
 
-roundFactor = 3;
+roundFactor = 1;
 %% 
 % Plots w/o normalization
 %%

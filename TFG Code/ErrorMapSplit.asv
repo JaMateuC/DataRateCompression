@@ -1,16 +1,15 @@
-max = 40;
+max = 512;
 errorMax = 8;
-error = zeros(max);
-bitsMatrix = zeros(max);
-exponent = zeros(max);
+error = zeros(1,max);
+bitsMatrix = zeros(1,max);
+exponent = zeros(1,max);
 found = false;
-maxBits = ceil(log2(max^2));
+maxBits = ceil(log2(max));
+
 
 for i=1:max
-    for j=1:max
-        error(i,j) = HuffmanPolar(tmwaveform,i,j,false);
-        bitsMatrix(i,j) = i*j;
-    end
+    error(i) = HuffmanSplit(tmwaveform,i,false);
+    bitsMatrix(i) = i;
 end
 
 intervalBits = 0:maxBits;
@@ -22,15 +21,12 @@ end
 dictUsage = bitsMatrix ./ exponent .*100;
 wastedBits = exponent - bitsMatrix;
 
-contourf(error,[0 8 9 10 11 12 13])
-axis([20 max 7 max])
+plot(error)
 figure
-contourf(dictUsage,1:10:100)
+plot(dictUsage)
 
 minBits = min(bitsMatrix(error <= errorMax));
 [row,column] = find(bitsMatrix == minBits & error <= errorMax);
 bestConf = {'Error','Exponent','NumBits','Wasted Bits','DictUsage';...
     error(row,column),exponent(row,column),bitsMatrix(row,column),...
     wastedBits(row,column),dictUsage(row,column)};
-
-HuffmanPolar(tmwaveform,row,column,true);
