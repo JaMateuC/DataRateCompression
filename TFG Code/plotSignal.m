@@ -3,6 +3,9 @@ function [] = plotSignal(signalData)
 figure
 subplot(2,2,2)
 plot(signalData,'x')
+title('Original signal')
+xlabel('Phase')
+ylabel('Quadrature')
 subplot(2,2,1)
 histogram(imag(signalData));
 view(-90, 90);

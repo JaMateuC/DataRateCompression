@@ -23,9 +23,17 @@ dictUsage = bitsMatrix ./ exponent .*100;
 wastedBits = exponent - bitsMatrix;
 
 contourf(error,[0 8 9 10 11 12 13])
-axis([20 max 7 max])
+colorbar
+title('Error vs Num. Intervals Angles and Radius')
+ylabel('Num. Angles')
+xlabel('Num. Radius')
+% axis([20 max 7 max])
 figure
 contourf(dictUsage,1:10:100)
+colorbar
+title('Dictionary usage')
+ylabel('Num. Angles')
+xlabel('Num. Radius')
 
 minBits = min(bitsMatrix(error <= errorMax));
 [row,column] = find(bitsMatrix == minBits & error <= errorMax);

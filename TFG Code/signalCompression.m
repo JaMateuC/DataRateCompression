@@ -1,10 +1,10 @@
-function [compressedSignal] = signalCompression(signalInput,intervalVector,interval)
+function [compressedSignal] = signalCompression(signalInput,intervalVector,max)
 
 compressedSignal = zeros(length(signalInput),1);
 
 for i=1:length(signalInput)
     if(signalInput(i) > intervalVector(end,1))
-        compressedSignal(i) = intervalVector(end,1) + interval/2;
+        compressedSignal(i) = max;
     elseif(signalInput(i) <= intervalVector(1,1))
         compressedSignal(i) = 0;
     else

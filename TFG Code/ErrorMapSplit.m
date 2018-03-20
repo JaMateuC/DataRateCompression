@@ -21,12 +21,21 @@ end
 dictUsage = bitsMatrix ./ exponent .*100;
 wastedBits = exponent - bitsMatrix;
 
+figure
 plot(error)
+title('EVM vs num. min. intervals')
+xlabel('Intervals')
+ylabel('EVM')
 figure
 plot(dictUsage)
+title('Dictionary usage')
+xlabel('Intervals')
+ylabel('Percentage')
 
 minBits = min(bitsMatrix(error <= errorMax));
 [row,column] = find(bitsMatrix == minBits & error <= errorMax);
 bestConf = {'Error','Exponent','NumBits','Wasted Bits','DictUsage';...
     error(row,column),exponent(row,column),bitsMatrix(row,column),...
     wastedBits(row,column),dictUsage(row,column)};
+
+HuffmanSplit(tmwaveform,minBits,true);
