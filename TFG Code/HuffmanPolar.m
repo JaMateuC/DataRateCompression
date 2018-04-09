@@ -13,15 +13,15 @@ intervalVectorRadius(end,2) = 1 - intervalVectorRadius(end,1);
 intervalVectorAngle = intervalVariable(intervalAngleVector);
 intervalVectorAngle(end,2) = 2*pi - intervalVectorAngle(end,1);
 
-compressedSignal(:,1) = signalCompression(polarSignal(:,1),intervalVectorRadius,1);
-compressedSignal(:,2) = signalCompression(polarSignal(:,2),intervalVectorAngle,0);
+compressedSignal(:,1) = signalCompression(polarSignal(:,1),intervalVectorRadius,1,0);
+compressedSignal(:,2) = signalCompression(polarSignal(:,2),intervalVectorAngle,0,0);
 compressedSignal(:,2) = compressedSignal(:,2) .* ~(compressedSignal(:,2) >= 2*pi);
 
 tmwavesformP = compressedSignal(:,1).*cos(compressedSignal(:,2)) + 1i * compressedSignal(:,1).*sin(compressedSignal(:,2));
 
-error = EVM(tmwaveform2,tmwavesformP);
+error = EVM(tmwaveform2,tmwavesformP,plots);
 
-%% Inteting plots with extra information about the compression
+%% Plots with extra information about the compression
 if(plots)
     intervalVector = intervalVectorFun(intervalVectorRadius,intervalVectorAngle);
     intervalVectorInv = intervalVectorFun(intervalVectorAngle,intervalVectorRadius);
@@ -34,46 +34,38 @@ if(plots)
     ylabel('Quadrature')
     grid on
 
+    histoEdges = 0.5:length(intervalVector)+0.5;
+    
     modulatedSignal = signalModulation(compressedSignal,intervalVector);
+    vectorSectionSize = ones(length(intervalRadiusVector)+1,1)*(length(intervalAngleVector)+1);
+    AccSamp = histcounts(modulatedSignal,histoEdges);
+    modulatedSignalCell = mat2cell(AccSamp,1,vectorSectionSize');
+    modulatedSignalTotal = cellfun(@(x) sum(x),modulatedSignalCell);
+    
+    figure
+    bar(modulatedSignalTotal)
+    title('Samples acumulated on each level (Radius intervals)')
+    xlabel('Interval')
+    ylabel('Samples acumulated')
 
     compressedSignalInv = [compressedSignal(:,2),compressedSignal(:,1)];
     modulatedSignalInv = signalModulation(compressedSignalInv,intervalVectorInv);
-
-    histoEdges = 0.5:length(intervalVector)+0.5;
+    vectorSectionSizeInv = ones(length(intervalAngleVector)+1,1)*(length(intervalRadiusVector)+1);
+    AccSampInv = histcounts(modulatedSignalInv,histoEdges);
+    modulatedSignalCellInv = mat2cell(AccSampInv,1,vectorSectionSizeInv');
+    modulatedSignalTotalInv = cellfun(@(x) sum(x),modulatedSignalCellInv);
 
     figure
-    histogram(modulatedSignal,histoEdges)
-    title('Samples acumulated on each level (Radius intervals)')
-    xlabel('Levels')
-    ylabel('Samples acumulated')
-    figure
-    histogram(modulatedSignalInv,histoEdges)
+    bar(modulatedSignalTotalInv)
     title('Samples acumulated on each level (Angles intervals)')
-    xlabel('Levels')
+    xlabel('Interval')
     ylabel('Samples acumulated')
 
-    nCounts = histcounts(modulatedSignal,histoEdges);
-    totalCount = sum(nCounts);
-    modulatedProbability = nCounts/totalCount;
-    dict = huffmandict(1:length(intervalVector),modulatedProbability);
+    ErrorAccumulated(compressedSignal(:,1),compressedSignal(:,2)...
+        ,intervalVector,tmwavesformP,tmwaveform2,intervalVectorRadius,intervalVectorAngle)
+    ErrorAccumulated(compressedSignal(:,2),compressedSignal(:,1)...
+        ,intervalVectorInv,tmwavesformP,tmwaveform2,intervalVectorAngle,intervalVectorRadius)
 
-    errorsVector = [abs(tmwavesformP - tmwaveform2),modulatedSignal];
-    errorsHist = zeros(length(dict),1);
-
-    for i=1:length(dict)
-        errorsHist(i) = sum(errorsVector(errorsVector(:,2) == i));
-    end
-    figure
-    bar(errorsHist)
-    hold on 
-    x = 0:length(dict);
-    y = raylpdf(x,150);
-    y = (max(errorsHist)-1)/max(y) * y;
-    plot(x,y,'g');
-    title('Error acumulation on each level')
-    ylabel('Error acumulated')
-    xlabel('Levels')
-    hold off
     figure
     tmwavesformP = compressedSignal(:,1).*cos(compressedSignal(:,2)) + 1i * compressedSignal(:,1).*sin(compressedSignal(:,2));
     plot(tmwavesformP, 'x')

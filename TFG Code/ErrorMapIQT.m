@@ -1,16 +1,16 @@
-tmwaveform = csvread('OriginalSignal.csv');
-max = 256;
+max = 40;
 errorMax = 8;
-error = zeros(1,max);
-bitsMatrix = zeros(1,max);
-exponent = zeros(1,max);
+error = zeros(max);
+bitsMatrix = zeros(max);
+exponent = zeros(max);
 found = false;
-maxBits = ceil(log2(max));
-
+maxBits = ceil(log2(max^2));
 
 for i=1:max
-    error(i) = HuffmanSplit(tmwaveform,i,false);
-    bitsMatrix(i) = i;
+    for j=1:max
+        error(i,j) = HuffmanIQTogether(tmwaveform,i,j,false);
+        bitsMatrix(i,j) = i*j;
+    end
 end
 
 intervalBits = 0:maxBits;
@@ -22,16 +22,18 @@ end
 dictUsage = bitsMatrix ./ exponent .*100;
 wastedBits = exponent - bitsMatrix;
 
+contourf(error,[0 8 9 10 11 12 13])
+colorbar
+title('Error vs Num. Intervals Angles and Radius')
+ylabel('Num. Phase')
+xlabel('Num. Quadrature')
+% axis([20 max 7 max])
 figure
-plot(error)
-title('EVM vs num. min. intervals')
-xlabel('Intervals')
-ylabel('EVM')
-figure
-plot(dictUsage)
+contourf(dictUsage,1:10:100)
+colorbar
 title('Dictionary usage')
-xlabel('Intervals')
-ylabel('Percentage')
+ylabel('Num. Phase')
+xlabel('Num. Quadrature')
 
 minBits = min(bitsMatrix(error <= errorMax));
 [row,column] = find(bitsMatrix == minBits & error <= errorMax);
@@ -39,4 +41,4 @@ bestConf = {'Error','Exponent','NumBits','Wasted Bits','DictUsage';...
     error(row,column),exponent(row,column),bitsMatrix(row,column),...
     wastedBits(row,column),dictUsage(row,column)};
 
-HuffmanSplit(tmwaveform,minBits,true);
+HuffmanIQTogether(tmwaveform,row,column,true);
