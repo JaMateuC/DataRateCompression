@@ -12,8 +12,8 @@ intervalVectorQuadrature(end,2) = 1 - intervalVectorQuadrature(end,1);
 intervalVectorPhase = intervalVariable(intervalPhaseVector);
 intervalVectorPhase(end,2) = 1 - intervalVectorPhase(end,1);
 
-compressedSignal(:,1) = signalCompression(real(tmwaveform2),intervalVectorPhase,1,-1);
-compressedSignal(:,2) = signalCompression(imag(tmwaveform2),intervalVectorQuadrature,1,-1);
+compressedSignal(:,1) = signalCompression2(real(tmwaveform2),intervalVectorPhase,1,-1);
+compressedSignal(:,2) = signalCompression2(imag(tmwaveform2),intervalVectorQuadrature,1,-1);
 
 tmwavesformC = compressedSignal(:,1) + 1i * compressedSignal(:,2);
 

@@ -1,25 +1,28 @@
-function [error] = HuffmanPolar(signal,numRadius,numAngles,plots)
+function [error] = HuffmanPolar(polarSignal,normSignal,numRadius,numAngles,plots,maxA)
 
 % polar signal
-tmwaveform2 = normalization(signal);
-polarSignal = toPolar(tmwaveform2);
+maxR = 2*pi;
 
-intervalAngle = 2*pi/numAngles;
+% a = histcounts(polarSignal(:,1),100)
+% sum(a(80:end))/sum(a)*100;
+
+intervalAngle = maxR/numAngles;
 intervalAngleVector = [0 + intervalAngle/2:intervalAngle:2*pi-intervalAngle/2]';
-intervalRadius = 1/numRadius;
-intervalRadiusVector = [0 + intervalRadius/2:intervalRadius:1-intervalRadius/2]';
+intervalRadius = maxA/numRadius;
+intervalRadiusVector = [0 + intervalRadius/2:intervalRadius:maxA-intervalRadius/2]';
 intervalVectorRadius = intervalVariable(intervalRadiusVector);
-intervalVectorRadius(end,2) = 1 - intervalVectorRadius(end,1);
+intervalVectorRadius(end,2) = maxA - intervalVectorRadius(end,1);
 intervalVectorAngle = intervalVariable(intervalAngleVector);
-intervalVectorAngle(end,2) = 2*pi - intervalVectorAngle(end,1);
+intervalVectorAngle(end,2) = maxR - intervalVectorAngle(end,1);
 
-compressedSignal(:,1) = signalCompression(polarSignal(:,1),intervalVectorRadius,1,0);
-compressedSignal(:,2) = signalCompression(polarSignal(:,2),intervalVectorAngle,0,0);
-compressedSignal(:,2) = compressedSignal(:,2) .* ~(compressedSignal(:,2) >= 2*pi);
+compressedSignal = signalCompression(polarSignal,intervalVectorRadius,intervalVectorAngle,maxA,0,0,0);
+% compressedSignal(:,1) = signalCompression2(polarSignal(:,1),intervalVectorRadius,maxA,0);
+% compressedSignal(:,2) = signalCompression2(polarSignal(:,2),intervalVectorAngle,0,0);
+compressedSignal(:,2) = compressedSignal(:,2) .* ~(compressedSignal(:,2) >= maxR);
 
 tmwavesformP = compressedSignal(:,1).*cos(compressedSignal(:,2)) + 1i * compressedSignal(:,1).*sin(compressedSignal(:,2));
 
-error = EVM(tmwaveform2,tmwavesformP,plots);
+error = EVM(normSignal,tmwavesformP,plots);
 
 %% Plots with extra information about the compression
 if(plots)
@@ -62,12 +65,11 @@ if(plots)
     ylabel('Samples acumulated')
 
     ErrorAccumulated(compressedSignal(:,1),compressedSignal(:,2)...
-        ,intervalVector,tmwavesformP,tmwaveform2,intervalVectorRadius,intervalVectorAngle)
+        ,intervalVector,tmwavesformP,normSignal,intervalVectorRadius,intervalVectorAngle)
     ErrorAccumulated(compressedSignal(:,2),compressedSignal(:,1)...
-        ,intervalVectorInv,tmwavesformP,tmwaveform2,intervalVectorAngle,intervalVectorRadius)
+        ,intervalVectorInv,tmwavesformP,normSignal,intervalVectorAngle,intervalVectorRadius)
 
     figure
-    tmwavesformP = compressedSignal(:,1).*cos(compressedSignal(:,2)) + 1i * compressedSignal(:,1).*sin(compressedSignal(:,2));
     plot(tmwavesformP, 'x')
     title('I/Q signal after compression')
     xlabel('Phase')

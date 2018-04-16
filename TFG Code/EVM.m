@@ -6,6 +6,7 @@ result = sqrt(sum(difference.^2)./...
     sum(abs(initialSignal).^2)) * 100;
 
 if(plots)
+    figure
     plot(difference)
     title('Error of each sample')
     xlabel('samples')
