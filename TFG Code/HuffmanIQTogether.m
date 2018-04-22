@@ -1,11 +1,12 @@
-function [error] = HuffmanIQTogether(signal,numPhase,numQuadrature,plots)
+function [error,avglen,signalSize] = HuffmanIQTogether(signal,numPhase,numQuadrature,plots,huffman)
+avglen = 0;
+signalSize = 0;
 
-% polar signal
 tmwaveform2 = normalization(signal);
 
-intervalPhase = 2/numPhase;
+intervalPhase = 2/(numPhase-1);
 intervalPhaseVector = [-1 + intervalPhase/2:intervalPhase:1-intervalPhase/2]';
-intervalQuadrature = 2/numQuadrature;
+intervalQuadrature = 2/(numQuadrature-1);
 intervalQuadratureVector = [-1 + intervalQuadrature/2:intervalQuadrature:1-intervalQuadrature/2]';
 intervalVectorQuadrature = intervalVariable(intervalQuadratureVector);
 intervalVectorQuadrature(end,2) = 1 - intervalVectorQuadrature(end,1);
@@ -50,4 +51,19 @@ if(plots)
     
     ErrorAccumulated(compressedSignal(:,1),compressedSignal(:,2)...
         ,intervalVector,tmwavesformC,tmwaveform2,intervalVectorQuadrature,intervalVectorPhase)
+end
+
+if(huffman)
+
+    intervalVector = intervalVectorFun(intervalVectorPhase,intervalVectorQuadrature);
+    
+    histoEdges = 0.5:length(intervalVector)+0.5;
+    modulatedSignal = signalModulation(compressedSignal,intervalVector);
+    AccSamp = histcounts(modulatedSignal,histoEdges);
+    
+    probVector = AccSamp./(ones(length(intervalVector),1).*length(signal))';
+    [dict,avglen] = huffmandictMod(1:length(intervalVector),probVector);
+    comp = huffmanencoMod(modulatedSignal,dict,1:length(intervalVector));
+    signalSize = length(comp);
+
 end

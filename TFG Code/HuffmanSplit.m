@@ -1,7 +1,8 @@
-function [error] = HuffmanSplit(signal,numBits,plots)
-
-maxI = 0.7;
- intervalAmplitude = 2*maxI/numBits;
+function [error,avglen,signalSize] = HuffmanSplit(signal,numBits,plots,huffman)
+avglen = 0;
+signalSize = 0;
+maxI = 1;
+ intervalAmplitude = 2*maxI/(numBits-1);
 %   x = 0.5:numBits/2;
 %   intervalAmplitudeVector = maxI* x.^1.45/max(x.^1.45);
 %   intervalAmplitudeVector = [-fliplr(intervalAmplitudeVector),intervalAmplitudeVector]';
@@ -19,9 +20,12 @@ SignalQuadrature = imag(tmwaveform2);
 compressedSignalPhase = signalCompression2(SignalPhase,VectorIntervals,maxI,-maxI);
 compressedSignalQuadrature = signalCompression2(SignalQuadrature,...
     VectorIntervals,maxI,-maxI);
+compressedSignal = round([compressedSignalPhase;compressedSignalQuadrature],5);
 tmwaveformC = compressedSignalPhase + 1i * compressedSignalQuadrature;
 
 error = EVM(tmwaveform2,tmwaveformC,plots);
+
+%% Plots
 
 if(plots)
     
@@ -60,4 +64,17 @@ if(plots)
     ErrorAccumulated(compressedSignalPhase,compressedSignalQuadrature...
         ,intervalVector,tmwaveformC,tmwaveform2,VectorIntervals,VectorIntervals)
     
+end
+
+if(huffman)
+    
+    intervalVector = intervalVectorFun(VectorIntervals,VectorIntervals);
+    intervalVector = round(intervalVector(1:numBits,2),5);
+    AccSamp = histcounts(compressedSignal,numBits);
+    
+    probVector = AccSamp./(ones(numBits,1).*2*length(signal))';
+    [dict,avglen] = huffmandictMod(intervalVector',probVector);
+    comp = huffmanencoMod(compressedSignal,dict,intervalVector);
+    signalSize = length(comp);
+
 end

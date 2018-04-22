@@ -1,14 +1,10 @@
 function [modulatedSignal] = signalModulation(compressedSignal,intervalVector)
 
 modulatedSignal = zeros(length(compressedSignal),1);
+compressedSignal = round(compressedSignal,7);
+intervalVector = round(intervalVector,7);
 
-for i=1:length(modulatedSignal)
-    
-    for j=1:length(intervalVector)
-        if(round(compressedSignal(i,:),7) == round(intervalVector(j,:),7))
-            modulatedSignal(i) = j;
-            break
-        end
-    end
-    
+for j=1:length(intervalVector)
+    modulatedSignal = j.*((compressedSignal(:,1) == intervalVector(j,1)) & (compressedSignal(:,2) == intervalVector(j,2)))+...
+    ~((compressedSignal(:,1) == intervalVector(j,1)) & (compressedSignal(:,2) == intervalVector(j,2))).*modulatedSignal;
 end

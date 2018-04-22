@@ -1,4 +1,6 @@
-function [error] = HuffmanPolar(polarSignal,normSignal,numRadius,numAngles,plots,maxA)
+function [error,avglen,signalSize] = HuffmanPolar(polarSignal,normSignal,numRadius,numAngles,plots,maxA,huffman)
+avglen = 0;
+signalSize = 0;
 
 % polar signal
 maxR = 2*pi;
@@ -7,7 +9,7 @@ maxR = 2*pi;
 % sum(a(80:end))/sum(a)*100;
 
 intervalAngle = maxR/numAngles;
-intervalAngleVector = [0 + intervalAngle/2:intervalAngle:2*pi-intervalAngle/2]';
+intervalAngleVector = [0 + intervalAngle/2:intervalAngle:maxR-intervalAngle/2]';
 intervalRadius = maxA/numRadius;
 intervalRadiusVector = [0 + intervalRadius/2:intervalRadius:maxA-intervalRadius/2]';
 intervalVectorRadius = intervalVariable(intervalRadiusVector);
@@ -75,3 +77,21 @@ if(plots)
     xlabel('Phase')
     ylabel('Quadrature')
 end
+
+%% Huffman
+if(huffman)
+    compressedSignal(:,2) = compressedSignal(:,2) .* ~(compressedSignal(:,1) == 0);
+    intervalVector = intervalVectorFun(intervalVectorRadius(2:end,:),intervalVectorAngle(1:end-1,:));
+    intervalVector = [[0,0];intervalVector];
+    
+    histoEdges = 0.5:length(intervalVector)+0.5;
+    modulatedSignal = signalModulation(compressedSignal,intervalVector);
+    AccSamp = histcounts(modulatedSignal,histoEdges);
+    
+    probVector = AccSamp./(ones(length(intervalVector),1).*length(polarSignal(:,1)))';
+    [dict,avglen] = huffmandictMod(1:length(intervalVector),probVector);
+    comp = huffmanencoMod(modulatedSignal,dict,1:length(intervalVector));
+    signalSize = length(comp);
+
+end
+
