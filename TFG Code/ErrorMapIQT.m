@@ -10,7 +10,7 @@ exponent = zeros(maxB);
 maxBits = ceil(log2(maxB^2));
 startP = 10;
 startQ = 10;
-huffman = true;
+huffman = false;
 maxErrPlot = 15;
 
 for i=startP:maxB
@@ -29,10 +29,9 @@ end
 dictUsage = bitsMatrix ./ exponent .*100;
 wastedBits = exponent - bitsMatrix;
 a = (error(startP:end,startQ:end) <= 15);
-[~,rowI] = max(a);
-[~,columnI] = max(a,[],2);
-rowI = min(rowI)+startP-1;
-columnI = min(columnI)+startQ-1;
+[rowI,columnI] = find(a == 1);
+rowI = min(rowI)+startP;
+columnI = min(columnI)+startQ;
 errorC = zeros(maxB) + max(max(error(rowI:end,columnI:end)));
 errorC(rowI:end,columnI:end) = error(rowI:end,columnI:end);
 

@@ -32,9 +32,17 @@ if(plots)
     intervalVectorInv = intervalVectorFun(intervalVectorAngle,intervalVectorRadius);
 
     constellation = intervalVector(:,1).*cos(intervalVector(:,2)) + 1i * intervalVector(:,1).*sin(intervalVector(:,2));
+    constellation = real(constellation) + 1i * round(imag(constellation),5);
+    constellation = unique(constellation);
+    figure
+    voronoi(real(constellation),imag(constellation))
+    title('Constellation')
+    xlabel('Phase')
+    ylabel('Quadrature')
+    grid on
     figure
     plot(constellation,'xr');
-    title(['Compressed signal constellation: Angle interval(' num2str(intervalRadius) '), Radius interval (' num2str(intervalAngle) ')'])
+    title('Constellation')
     xlabel('Phase')
     ylabel('Quadrature')
     grid on

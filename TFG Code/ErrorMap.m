@@ -32,10 +32,9 @@ end
 dictUsage = bitsMatrix ./ exponent .*100;
 wastedBits = exponent - bitsMatrix;
 a = (error(startR:end,startA:end) <= 15);
-[~,rowI] = max(a);
-[~,columnI] = max(a,[],2);
-rowI = min(rowI)+startR-1;
-columnI = min(columnI)+startA-1;
+[rowI,columnI] = find(a == 1);
+rowI = min(rowI)+startR;
+columnI = min(columnI)+startA;
 errorC = zeros(maxB) + max(max(error(rowI:end,columnI:end)));
 errorC(rowI:end,columnI:end) = error(rowI:end,columnI:end);
 
@@ -96,6 +95,8 @@ bestConf = {'Error','Num. Bits','Num Values','Wasted Values','DictUsage','Avg. l
 % bitsMatrixN = bitsMatrix(rowMin:end,colMin:end);
 % wastedBitsN = wastedBits(rowMin:end,colMin:end);
 % dictUsageN = dictUsage(rowMin:end,colMin:end);
+% avglenN = avglen(rowMin:end,colMin:end);
+% signalSizeN = signalSize(rowMin:end,colMin:end);
 % usefulMat = errorN > errorMax;
 % 
 % maxMin = [maxA,0.6];
@@ -108,7 +109,7 @@ bestConf = {'Error','Num. Bits','Num Values','Wasted Values','DictUsage','Avg. l
 %         for i=1:maxB-rowMin
 %             for j=1:maxB-colMin
 %                 if(usefulMat(i,j))
-%                     errorN(i,j) = HuffmanPolar(polarSignal,tmwaveform2,i-1+rowMin,j-1+colMin,false,maxA,false);
+%                     [errorN(i,j),avglenN(i,j),signalSizeN(i,j)] = HuffmanPolar(polarSignal,tmwaveform2,i-1+rowMin,j-1+colMin,false,maxA,false);
 %                 end
 %             end
 %         end
@@ -121,8 +122,8 @@ bestConf = {'Error','Num. Bits','Num Values','Wasted Values','DictUsage','Avg. l
 %         l=l+1;
 %     end
 %     [a,indx] = min(minBits(:,1));
-%     maxMin(1) = minBits(find(minBits(1:indx,1)>a,1,'last'),2);
-%     maxMin(2) = minBits(find(minBits(indx+1:end,1)>a,1)+indx,2);
+%     maxMin(1) = minBits(find(minBits(1:indx,1)>=a,1,'last'),2);
+%     maxMin(2) = minBits(find(minBits(indx+1:end,1)>=a,1)+indx,2);
 % end
 % 
 % mtxInt = minBits(minBits(:,1) == min(minBits(:,1)) ,:);

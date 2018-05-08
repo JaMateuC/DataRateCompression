@@ -23,6 +23,12 @@ error = EVM(tmwaveform2,tmwavesformC,plots);
 %% Plots with extra information about the compression
 if(plots)
     intervalVector = intervalVectorFun(intervalVectorPhase,intervalVectorQuadrature);
+    voronoi(intervalVector(:,1),intervalVector(:,2))
+    title('Constellation')
+    xlabel('Phase')
+    ylabel('Quadrature')
+    grid on
+    axis([-1.1 1.1 -1.1 1.1])
     figure
     plot(intervalVector(:,1),intervalVector(:,2), 'xr')
     xlabel('Phase')
