@@ -81,3 +81,10 @@ bestConf = {'Error','Num. Bits','Num Values','Wasted Values','DictUsage','Avg. l
     wastedBits(row,column),dictUsage(row,column),aaa,sss};
 
 % profile viewer
+
+%% Fit
+
+[eee,aaa,sss] = HuffmanFitIQTogether(tmwaveform,row,column,true,true);
+bestConf2 = {'Error','Num. Bits','Num Values','Wasted Values','DictUsage','Avg. len','Size Signal';...
+    eee,log2(exponent(row,column)),bitsMatrix(row,column),...
+    wastedBits(row,column),dictUsage(row,column),aaa,sss};

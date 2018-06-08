@@ -138,3 +138,10 @@ bestConf = {'Error','Num. Bits','Num Values','Wasted Values','DictUsage','Avg. l
 %     dictUsageN(row,column),avglen,signalSize};
 % 
 % profile viewer
+
+%% Fit
+
+[eee,aaa,sss] = HuffmanFitPolar(polarSignal,tmwaveform2,row,column,true,true);
+bestConf2 = {'Error','Num. Bits','Num Values','Wasted Values','DictUsage','Avg. len','Size Signal';...
+    eee,log2(exponent(row,column)),bitsMatrix(row,column)-1,...
+    wastedBits(row,column)+1,bitsMatrix(row,column)-1/exponent(row,column)*100,aaa,sss};

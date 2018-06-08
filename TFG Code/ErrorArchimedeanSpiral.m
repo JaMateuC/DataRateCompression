@@ -1,7 +1,7 @@
-profile on
+% profile on
 tmwaveform = csvread('OriginalSignal.csv');
-startB = 100;
-maxB = 800;
+startB = 350;
+maxB = 400;
 errormaxB = 8;
 maxV = 20;
 error = zeros(maxB,maxV)+500;
@@ -11,7 +11,7 @@ bitsMatrix = zeros(maxB,maxV);
 exponent = zeros(maxB,maxV);
 maxBBits = ceil(log2(maxB));
 huffman = false;
-startVueltas = 1;
+startVueltas = 5;
 
 
 for i=startB:maxB
@@ -21,7 +21,7 @@ for i=startB:maxB
     end    
 end
 
-profile viewer
+% profile viewer
 
 intervalBits = 0:maxBBits;
 for i=1:maxBBits
@@ -84,4 +84,10 @@ bestConf = {'Error','Num. Bits','Num Values','Wasted Values','DictUsage','Avg. l
     eee,log2(exponent(row,column)),bitsMatrix(row,column),...
     wastedBits(row,column),dictUsage(row,column),aaa,sss};
 
-profile viewer
+%% Quant fit
+[eee,aaa,sss,newLen] = HuffmanFitSpiral(tmwaveform,row,column,true,true);
+bestConf2 = {'Error','Num. Bits','Num Values','Wasted Values','DictUsage','Avg. len','Size Signal';...
+    eee,log2(exponent(newLen,column)),newLen,...
+    wastedBits(newLen,column),dictUsage(newLen,column),aaa,sss};
+
+% profile viewer

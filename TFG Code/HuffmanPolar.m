@@ -102,4 +102,3 @@ if(huffman)
     signalSize = length(comp);
 
 end
-

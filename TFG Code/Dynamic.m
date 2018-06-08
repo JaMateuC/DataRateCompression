@@ -1,5 +1,8 @@
-% profile on
 tmwaveform = csvread('OriginalSignal.csv');
+tmwaveform2 = normalization(tmwaveform);
+
+% distancePolar = abs(tmwaveform2(1:end-1)-tmwaveform2(2:end));
+% histogram(distancePolar,100)
 startB = 5;
 maxB = 256;
 errormaxB = 8;
@@ -9,11 +12,12 @@ signalSize = zeros(1,maxB);
 bitsMatrix = zeros(1,maxB);
 exponent = zeros(1,maxB);
 maxBBits = ceil(log2(maxB));
-huffman = true;
+huffman = false;
+trueValue = 10;
 
 
 for i=startB:maxB
-    [error(i),avglen(i),signalSize(i)] = HuffmanSplit(tmwaveform,i,false,huffman);
+    [error(i),avglen(i),signalSize(i)] = HuffmanDynamicSplit(tmwaveform,i,trueValue,false,huffman);
     bitsMatrix(i) = i;
 end
 
@@ -50,13 +54,5 @@ minBits = min(bitsMatrix(error <= errormaxB));
 [row,column] = find(bitsMatrix == minBits & error <= errormaxB);
 [eee,aaa,sss] = HuffmanSplit(tmwaveform,minBits,true,true);
 bestConf = {'Error','Num. Bits','Num Values','Wasted Values','DictUsage','Avg. len','Size Signal';...
-    eee,log2(exponent(row,column)),bitsMatrix(row,column),...
-    wastedBits(row,column),dictUsage(row,column),aaa,sss};
-
-% profile viewer
-
-%% Fit
-[eee,aaa,sss] = HuffmanFitSplit(tmwaveform,minBits,true,true);
-bestConf2 = {'Error','Num. Bits','Num Values','Wasted Values','DictUsage','Avg. len','Size Signal';...
     eee,log2(exponent(row,column)),bitsMatrix(row,column),...
     wastedBits(row,column),dictUsage(row,column),aaa,sss};
