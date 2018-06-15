@@ -20,13 +20,9 @@ constellation = reshape(constellation,[],1);
 minDAll = abs(tmwaveform2-constellation');
 [~,minInd] = min(minDAll,[],2);
 tmwaveformC = constellation(minInd)'.';
-
 error = EVM(tmwaveform2,tmwaveformC,plots);
-
 %% Plots
-
 if(plots)
-
     figure
     plot(real(constellation),imag(constellation), 'xr')
     xlabel('Phase')

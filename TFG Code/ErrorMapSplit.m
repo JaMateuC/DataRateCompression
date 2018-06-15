@@ -10,7 +10,9 @@ bitsMatrix = zeros(1,maxB);
 exponent = zeros(1,maxB);
 maxBBits = ceil(log2(maxB));
 huffman = true;
+tmwaveform2 = normalization(tmwaveform);
 
+stdSignal = bitStd(tmwaveform2);
 
 for i=startB:maxB
     [error(i),avglen(i),signalSize(i)] = HuffmanSplit(tmwaveform,i,false,huffman);

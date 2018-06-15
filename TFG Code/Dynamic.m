@@ -1,8 +1,6 @@
 tmwaveform = csvread('OriginalSignal.csv');
 tmwaveform2 = normalization(tmwaveform);
 
-% distancePolar = abs(tmwaveform2(1:end-1)-tmwaveform2(2:end));
-% histogram(distancePolar,100)
 startB = 5;
 maxB = 256;
 errormaxB = 8;

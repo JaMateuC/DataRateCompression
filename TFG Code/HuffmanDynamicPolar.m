@@ -1,53 +1,54 @@
-function [error,avglen,signalSize] = HuffmanDynamicSplit(signal,numValues,trueValue,plots,huffman)
+function [error,avglen,signalSize] = HuffmanDynamicPolar(signal,numValuesAng,numValuesRad,trueValue,plots,huffman)
 
-maxI = .7;
-startSigP = zeros(length(signal),1);
-startSigQ = zeros(length(signal),1);
+maxR = .65;
+maxA = 6;
+startSig = zeros(length(signal),1);
 
 tmwaveform2 = normalization(signal);
-startSigP(1) = real(tmwaveform2(1));
-startSigQ(1) = imag(tmwaveform2(1));
+startSig(1) = tmwaveform2(1);
 
-distanceReal = real(tmwaveform2(1:end-1))-real(tmwaveform2(2:end));
-distanceImag = imag(tmwaveform2(1:end-1))-imag(tmwaveform2(2:end));
+distancePolar = abs(abs(tmwaveform2(1:end-1))-abs(tmwaveform2(2:end)));
+distanceAngle = atan2(imag(tmwaveform2(1:end-1)),real(tmwaveform2(1:end-1))) - atan2(imag(tmwaveform2(2:end)),real(tmwaveform2(2:end)));
 
 TreuValuesVecIndx = 1:trueValue:length(tmwaveform2)-trueValue;
 
 
-intervalAmplitude = 2*maxI/(numValues-1);
- intervalAmplitudeVector = [-maxI + intervalAmplitude/2:intervalAmplitude:...
-    maxI-intervalAmplitude/2]';
-VectorIntervals = intervalVariable(intervalAmplitudeVector);
-VectorIntervals(end,2) = maxI - VectorIntervals(end,1);
+intervalRad = maxR/(numValuesRad);
+intervalRadVector = [0+intervalRad:intervalRad:maxR]';
+intervalAng = 2*maxA/(numValuesAng-1);
+intervalAngVector = [-maxA:intervalAng:maxA]';
 
-compressedDistanceSignalPhase = signalCompression2(distanceReal,VectorIntervals,maxI,-maxI);
-compressedDistanceSignalQuadrature = signalCompression2(distanceImag,...
-    VectorIntervals,maxI,-maxI);
+minDAll = abs(distancePolar-intervalRadVector');
+[~,minInd] = min(minDAll,[],2);
+tmwaveformCRad = intervalRadVector(minInd)'.';
 
-for i=1:length(distanceImag)
+minDAll = abs(distanceAngle-intervalAngVector');
+[~,minInd] = min(minDAll,[],2);
+tmwaveformCAng = intervalAngVector(minInd)'.';
+
+for i=1:length(distanceAngle)
     
     if(sum(TreuValuesVecIndx == (i+1)))
-        startSigP(i+1) = real(tmwaveform2(i+1));
-        startSigQ(i+1) = imag(tmwaveform2(i+1));
+        startSig(i+1) = tmwaveform2(i+1);
     else
-        startSigP(i+1) = startSigP(i) - compressedDistanceSignalPhase(i);
-        startSigQ(i+1) = startSigQ(i) - compressedDistanceSignalQuadrature(i);
+        SAng = atan2(imag(startSig(i)),real(startSig(i))) - tmwaveformCAng(i);
+        SRad = abs(startSig(i)) + tmwaveformCRad(i);
+        startSig(i+1) = SRad * cos(SAng) + 1i * SRad * sin(SAng);
     end
     
 end
 
-compressedDistanceSignal = round([compressedDistanceSignalPhase;compressedDistanceSignalQuadrature],5);
-tmwaveformC = startSigP + 1i * startSigQ;
+tmwaveformC = round(startSig,5);
 
 error = EVM(tmwaveform2,tmwaveformC,plots);
 
 if(plots)
     
     figure
-    histogram(distanceReal,200)
-
+    histogram(distancePolar,100)
+    
     figure
-    histogram(distanceImag,200)
+    histogram(distanceAngle,100)
     
     intervalVector = intervalVectorFun(VectorIntervals,VectorIntervals);
     figure
