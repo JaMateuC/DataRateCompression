@@ -1,22 +1,23 @@
 tmwaveform = csvread('OriginalSignal.csv');
 tmwaveform2 = normalization(tmwaveform);
 
-startB = 5;
-maxB = 256;
+startVal = 10;
+maxVal = 30;
+startTrueVal = 20;
 errormaxB = 8;
-error = zeros(1,maxB)+500;
-avglen = zeros(1,maxB);
-signalSize = zeros(1,maxB);
-bitsMatrix = zeros(1,maxB);
-exponent = zeros(1,maxB);
-maxBBits = ceil(log2(maxB));
-huffman = false;
+error = zeros(1,maxVal)+500;
+avglen = zeros(1,maxVal);
+signalSize = zeros(1,maxVal);
+bitsMatrix = zeros(1,maxVal);
+exponent = zeros(1,maxVal);
+maxBBits = ceil(log2(maxVal));
+huffman = true;
 trueValue = 10;
 
 
-for i=startB:maxB
-    [error(i),avglen(i),signalSize(i)] = HuffmanDynamicSplit(tmwaveform,i,trueValue,false,huffman);
-    bitsMatrix(i) = i;
+for i=startVal:maxVal
+    [error(i),avglen(i),signalSize(i)] = HuffmanDynamicSplit(tmwaveform,i,0,false,huffman);
+    bitsMatrix(:,i) = i;
 end
 
 intervalBits = 0:maxBBits;
@@ -28,29 +29,30 @@ end
 dictUsage = bitsMatrix ./ exponent .*100;
 wastedBits = exponent - bitsMatrix;
 
-figure
-plot(error)
-title('EVM vs num. min. intervals')
-xlabel('Intervals')
-ylabel('EVM (%)')
+plot(error);
+title('EVM(%) vs num. Values')
+ylabel('EVM(%)')
+xlabel('Num. Values')
+axis([startVal maxVal 0 max(error(startVal:end))])
 
 if(huffman)
     figure
     plot(avglen)
-    title('Average length vs num. min. intervals')
+    title('Average length vs num. Values')
     xlabel('Intervals')
     ylabel('bits')
+    axis([startVal maxVal 0 max(avglen(startVal:end))])
 
     figure
     plot(signalSize)
-    title('Signal size vs num. min. intervals')
+    title('Signal size vs num. Values')
     xlabel('Intervals')
     ylabel('size(bits)')
+    axis([startVal maxVal min(signalSize(startVal:end)) max(signalSize(startVal:end))])
 end
 
 minBits = min(bitsMatrix(error <= errormaxB));
-[row,column] = find(bitsMatrix == minBits & error <= errormaxB);
-[eee,aaa,sss] = HuffmanSplit(tmwaveform,minBits,true,true);
+[eee,aaa,sss] = HuffmanDynamicSplit(tmwaveform,minBits,0,true,true);
 bestConf = {'Error','Num. Bits','Num Values','Wasted Values','DictUsage','Avg. len','Size Signal';...
-    eee,log2(exponent(row,column)),bitsMatrix(row,column),...
-    wastedBits(row,column),dictUsage(row,column),aaa,sss};
+    eee,log2(exponent(minBits)),bitsMatrix(minBits),...
+    wastedBits(minBits),dictUsage(minBits),aaa,sss};

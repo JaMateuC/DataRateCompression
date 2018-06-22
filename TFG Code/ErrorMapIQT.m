@@ -35,12 +35,12 @@ columnI = min(columnI)+startQ;
 errorC = zeros(maxB) + max(max(error(rowI:end,columnI:end)));
 errorC(rowI:end,columnI:end) = error(rowI:end,columnI:end);
 
-imagesc(flip(errorC));
+imagesc(errorC);
 colorbar
 title('EVM(%) vs Num. Intervals Phase and Quadrature')
 ylabel('Num. Phase')
 xlabel('Num. Quadrature')
-axis([columnI maxB 1 maxB-rowI])
+axis([columnI maxB rowI maxB])
 
 if(huffman)
     avglenC = zeros(maxB) + max(max(avglen(rowI:end,columnI:end)));

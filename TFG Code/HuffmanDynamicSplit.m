@@ -1,5 +1,8 @@
 function [error,avglen,signalSize] = HuffmanDynamicSplit(signal,numValues,trueValue,plots,huffman)
 
+avglen = 0;
+signalSize = 0;
+
 maxI = .7;
 startSigP = zeros(length(signal),1);
 startSigQ = zeros(length(signal),1);
@@ -13,16 +16,15 @@ distanceImag = imag(tmwaveform2(1:end-1))-imag(tmwaveform2(2:end));
 
 TreuValuesVecIndx = 1:trueValue:length(tmwaveform2)-trueValue;
 
-
 intervalAmplitude = 2*maxI/(numValues-1);
- intervalAmplitudeVector = [-maxI + intervalAmplitude/2:intervalAmplitude:...
+intervalAmplitudeVector = [-maxI + intervalAmplitude/2:intervalAmplitude:...
     maxI-intervalAmplitude/2]';
 VectorIntervals = intervalVariable(intervalAmplitudeVector);
 VectorIntervals(end,2) = maxI - VectorIntervals(end,1);
+intervalVector = intervalVectorFun(VectorIntervals,VectorIntervals);
+const = intervalVector(1:numValues:end,1);
 
-compressedDistanceSignalPhase = signalCompression2(distanceReal,VectorIntervals,maxI,-maxI);
-compressedDistanceSignalQuadrature = signalCompression2(distanceImag,...
-    VectorIntervals,maxI,-maxI);
+j = 1;
 
 for i=1:length(distanceImag)
     
@@ -30,13 +32,20 @@ for i=1:length(distanceImag)
         startSigP(i+1) = real(tmwaveform2(i+1));
         startSigQ(i+1) = imag(tmwaveform2(i+1));
     else
-        startSigP(i+1) = startSigP(i) - compressedDistanceSignalPhase(i);
-        startSigQ(i+1) = startSigQ(i) - compressedDistanceSignalQuadrature(i);
+        diffP = real(tmwaveform2(i+1)) - startSigP(i);
+        diffQ = imag(tmwaveform2(i+1)) - startSigQ(i);
+        [~,indxP] = min(abs(diffP-const));
+        [~,indxQ] = min(abs(diffQ-const));
+        compressedDistanceSignalPhase(j) = const(indxP);
+        compressedDistanceSignalQuadrature(j) = const(indxQ);
+        startSigP(i+1) = startSigP(i) + const(indxP);
+        startSigQ(i+1) = startSigQ(i) + const(indxQ);
+        j = j + 1;
     end
     
 end
 
-compressedDistanceSignal = round([compressedDistanceSignalPhase;compressedDistanceSignalQuadrature],5);
+compressedDistanceSignal = round([compressedDistanceSignalPhase';compressedDistanceSignalQuadrature'],5);
 tmwaveformC = startSigP + 1i * startSigQ;
 
 error = EVM(tmwaveform2,tmwaveformC,plots);
@@ -49,7 +58,6 @@ if(plots)
     figure
     histogram(distanceImag,200)
     
-    intervalVector = intervalVectorFun(VectorIntervals,VectorIntervals);
     figure
     plot(intervalVector(:,1),intervalVector(:,2), 'xr')
     xlabel('Phase')
@@ -96,12 +104,12 @@ if(plots)
 end
 
 if(huffman)
-    intervalVector = intervalVectorFun(VectorIntervals,VectorIntervals);
-    intervalVector = round(intervalVector(1:numValues,2),5);
+
+    const = round(const,5);
     AccSamp = histcounts(compressedDistanceSignal,numValues);
     
     probVector = AccSamp./(ones(numValues,1).*length(compressedDistanceSignal))';
-    [dict,avglen] = huffmandictMod(intervalVector',probVector);
-    [comp] = huffmanencoMod(compressedDistanceSignal,dict,intervalVector);
+    [dict,avglen] = huffmandictMod(const',probVector);
+    [comp] = huffmanencoMod(compressedDistanceSignal,dict,const);
     signalSize = length(comp);
 end

@@ -38,12 +38,12 @@ columnI = min(columnI)+startA;
 errorC = zeros(maxB) + max(max(error(rowI:end,columnI:end)));
 errorC(rowI:end,columnI:end) = error(rowI:end,columnI:end);
 
-imagesc(flip(errorC));
+imagesc(errorC);
 colorbar
 title('EVM(%) vs Num. Intervals Angles and Radius')
 ylabel('Num. Angle')
 xlabel('Num. Radius')
-axis([columnI maxB 1 maxB-rowI])
+axis([columnI maxB rowI maxB])
 
 if(huffman)
     avglenC = zeros(maxB) + max(max(avglen(rowI:end,columnI:end)));
