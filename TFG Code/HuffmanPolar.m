@@ -1,12 +1,10 @@
-function [error,avglen,signalSize] = HuffmanPolar(polarSignal,normSignal,numRadius,numAngles,plots,maxA,huffman)
+function [error,avglen,signalSize] = HuffmanPolar(polarSignal,normSignal,numRadius,numAngles,plots,huffman)
 avglen = 0;
 signalSize = 0;
 
 % polar signal
 maxR = 2*pi;
-
-% a = histcounts(polarSignal(:,1),100)
-% sum(a(80:end))/sum(a)*100;
+maxA = 1;
 
 intervalAngle = maxR/numAngles;
 intervalAngleVector = [0 + intervalAngle/2:intervalAngle:maxR-intervalAngle/2]';
@@ -18,8 +16,6 @@ intervalVectorAngle = intervalVariable(intervalAngleVector);
 intervalVectorAngle(end,2) = maxR - intervalVectorAngle(end,1);
 
 compressedSignal = signalCompression(polarSignal,intervalVectorRadius,intervalVectorAngle,maxA,0,0,0);
-% compressedSignal(:,1) = signalCompression2(polarSignal(:,1),intervalVectorRadius,maxA,0);
-% compressedSignal(:,2) = signalCompression2(polarSignal(:,2),intervalVectorAngle,0,0);
 compressedSignal(:,2) = compressedSignal(:,2) .* ~(compressedSignal(:,2) >= maxR);
 
 tmwavesformP = compressedSignal(:,1).*cos(compressedSignal(:,2)) + 1i * compressedSignal(:,1).*sin(compressedSignal(:,2));

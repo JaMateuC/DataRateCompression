@@ -2,8 +2,6 @@ function [error,avglen,signalSize] = HuffmanIQTogether(signal,numPhase,numQuadra
 avglen = 0;
 signalSize = 0;
 
-tmwaveform2 = normalization(signal);
-
 intervalPhase = 2/(numPhase-1);
 intervalPhaseVector = [-1 + intervalPhase/2:intervalPhase:1-intervalPhase/2]';
 intervalQuadrature = 2/(numQuadrature-1);
@@ -13,12 +11,12 @@ intervalVectorQuadrature(end,2) = 1 - intervalVectorQuadrature(end,1);
 intervalVectorPhase = intervalVariable(intervalPhaseVector);
 intervalVectorPhase(end,2) = 1 - intervalVectorPhase(end,1);
 
-compressedSignal(:,1) = signalCompression2(real(tmwaveform2),intervalVectorPhase,1,-1);
-compressedSignal(:,2) = signalCompression2(imag(tmwaveform2),intervalVectorQuadrature,1,-1);
+compressedSignal(:,1) = signalCompression2(real(signal),intervalVectorPhase,1,-1);
+compressedSignal(:,2) = signalCompression2(imag(signal),intervalVectorQuadrature,1,-1);
 
 tmwavesformC = compressedSignal(:,1) + 1i * compressedSignal(:,2);
 
-error = EVM(tmwaveform2,tmwavesformC,plots);
+error = EVM(signal,tmwavesformC,plots);
 
 %% Plots with extra information about the compression
 if(plots)
@@ -35,16 +33,14 @@ if(plots)
     ylabel('Quadrature')
     title('Constellation')
     
-    plotSignal(signal)
-    
     figure
-    histogram(real(tmwaveform2),intervalPhaseVector')
+    histogram(real(signal),intervalPhaseVector')
     title('Samples acumulated on each level (Phase)')
     ylabel('Samples accumulated')
     xlabel('Interval')
     
     figure
-    histogram(imag(tmwaveform2),intervalQuadratureVector')
+    histogram(imag(signal),intervalQuadratureVector')
     title('Samples acumulated on each level (Quadrature)')
     ylabel('Samples accumulated')
     xlabel('Interval')
@@ -56,7 +52,7 @@ if(plots)
     xlabel('Phase')
     
     ErrorAccumulated(compressedSignal(:,1),compressedSignal(:,2)...
-        ,intervalVector,tmwavesformC,tmwaveform2,intervalVectorQuadrature,intervalVectorPhase)
+        ,intervalVector,tmwavesformC,signal,intervalVectorQuadrature,intervalVectorPhase)
 end
 
 if(huffman)

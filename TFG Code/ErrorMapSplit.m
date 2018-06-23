@@ -1,64 +1,34 @@
-% profile on
 tmwaveform = csvread('OriginalSignal.csv');
-startB = 5;
-maxB = 256;
+startVal = 5;
+maxVal = 256;
 errormaxB = 8;
-error = zeros(1,maxB)+500;
-avglen = zeros(1,maxB);
-signalSize = zeros(1,maxB);
-bitsMatrix = zeros(1,maxB);
-exponent = zeros(1,maxB);
-maxBBits = ceil(log2(maxB));
-huffman = true;
-tmwaveform2 = normalization(tmwaveform);
+error = zeros(1,maxVal)+500;
+avglen = zeros(1,maxVal);
+signalSize = zeros(1,maxVal);
+bitsMatrix = zeros(1,maxVal);
+huffman = false;
 
+tmwaveform2 = normalization(tmwaveform);
 stdSignal = bitStd(tmwaveform2);
 
-for i=startB:maxB
-    [error(i),avglen(i),signalSize(i)] = HuffmanSplit(tmwaveform,i,false,huffman);
+for i=startVal:maxVal
+    [error(i),avglen(i),signalSize(i)] = HuffmanSplit(stdSignal,i,false,huffman);
     bitsMatrix(i) = i;
 end
 
-intervalBits = 0:maxBBits;
-for i=1:maxBBits
-    logicalmatrix = (bitsMatrix > 2^intervalBits(i) & bitsMatrix <= 2^intervalBits(i+1));
-    exponent = exponent + logicalmatrix .* 2^intervalBits(i+1);
-end
-
-dictUsage = bitsMatrix ./ exponent .*100;
-wastedBits = exponent - bitsMatrix;
-
-figure
-plot(error)
-title('EVM vs num. min. intervals')
-xlabel('Intervals')
-ylabel('EVM (%)')
-
-if(huffman)
-    figure
-    plot(avglen)
-    title('Average length vs num. min. intervals')
-    xlabel('Intervals')
-    ylabel('bits')
-
-    figure
-    plot(signalSize)
-    title('Signal size vs num. min. intervals')
-    xlabel('Intervals')
-    ylabel('size(bits)')
-end
+[dictUsage,wastedBits,exponent] = plot1DResults(error,bitsMatrix,avglen,signalSize,startVal,maxVal,huffman);
 
 minBits = min(bitsMatrix(error <= errormaxB));
 [row,column] = find(bitsMatrix == minBits & error <= errormaxB);
-[eee,aaa,sss] = HuffmanSplit(tmwaveform,minBits,true,true);
+[eee,aaa,sss] = HuffmanSplit(stdSignal,minBits,true,true);
 bestConf = {'Error','Num. Bits','Num Values','Wasted Values','DictUsage','Avg. len','Size Signal';...
     eee,log2(exponent(row,column)),bitsMatrix(row,column),...
     wastedBits(row,column),dictUsage(row,column),aaa,sss};
 
-% profile viewer
-
 %% Fit
-[eee,aaa,sss] = HuffmanFitSplit(tmwaveform,minBits,true,true);
+[eee,aaa,sss] = HuffmanFitSplit(stdSignal,minBits,true,true);
 bestConf2 = {'Error','Num. Bits','Num Values','Wasted Values','DictUsage','Avg. len','Size Signal';...
     eee,log2(exponent(row,column)),bitsMatrix(row,column),...
     wastedBits(row,column),dictUsage(row,column),aaa,sss};
+
+plotSignal(tmwaveform)

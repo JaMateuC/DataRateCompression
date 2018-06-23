@@ -2,25 +2,23 @@ function [error,avglen,signalSize] = HuffmanFitSplit(signal,numBits,plots,huffma
 avglen = 0;
 signalSize = 0;
 
-tmwaveform2 = normalization(signal);
-
-numSamplesInt = ceil(2*length(tmwaveform2)/numBits);
-tmw = [real(tmwaveform2);imag(tmwaveform2)];
+numSamplesInt = ceil(2*length(signal)/numBits);
+tmw = [real(signal);imag(signal)];
 distancesSamples = sort(real(tmw));
 pointsImp = distancesSamples(1:numSamplesInt:end);
 pointsImp = [-1;pointsImp(2:end);1];
 pointsImp = (pointsImp(1:end-1)+pointsImp(2:end))/2;
 
-SignalPhase = real(tmwaveform2);
-SignalQuadrature = imag(tmwaveform2);
+SignalPhase = real(signal);
+SignalQuadrature = imag(signal);
 
 constellation = pointsImp + 1i * pointsImp';
 constellation = reshape(constellation,[],1);
 
-minDAll = abs(tmwaveform2-constellation');
+minDAll = abs(signal-constellation');
 [~,minInd] = min(minDAll,[],2);
 tmwaveformC = constellation(minInd)'.';
-error = EVM(tmwaveform2,tmwaveformC,plots);
+error = EVM(signal,tmwaveformC,plots);
 %% Plots
 if(plots)
     figure
@@ -60,7 +58,7 @@ if(plots)
     
     vectorSectionSize = ones(numBits,1)*numBits;
     
-    errorsVector = [abs(tmwaveformC - tmwaveform2),minInd];
+    errorsVector = [abs(tmwaveformC - signal),minInd];
     errorsHist = zeros(length(constellation),1);
     for i=1:length(constellation)
         errorsHist(i) = sum(errorsVector(errorsVector(:,2) == i));
@@ -77,7 +75,7 @@ end
 
 if(huffman)
     
-    tmwT = [real(tmwaveform2);imag(tmwaveform2)];
+    tmwT = [real(signal);imag(signal)];
     minDAll = abs(tmwT-pointsImp');
     [~,minInd] = min(minDAll,[],2);
     tmwTotal = pointsImp(minInd)'.';

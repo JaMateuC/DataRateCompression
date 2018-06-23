@@ -3,19 +3,14 @@ avglen = 0;
 signalSize = 0;
 maxI = 1;
  intervalAmplitude = 2*maxI/(numBits-1);
-%   x = 0.5:numBits/2;
-%   intervalAmplitudeVector = maxI* x.^1.45/max(x.^1.45);
-%   intervalAmplitudeVector = [-fliplr(intervalAmplitudeVector),intervalAmplitudeVector]';
  
  intervalAmplitudeVector = [-maxI + intervalAmplitude/2:intervalAmplitude:...
     maxI-intervalAmplitude/2]';
 VectorIntervals = intervalVariable(intervalAmplitudeVector);
 VectorIntervals(end,2) = maxI - VectorIntervals(end,1);
 
-tmwaveform2 = normalization(signal);
-
-SignalPhase = real(tmwaveform2);
-SignalQuadrature = imag(tmwaveform2);
+SignalPhase = real(signal);
+SignalQuadrature = imag(signal);
 
 compressedSignalPhase = signalCompression2(SignalPhase,VectorIntervals,maxI,-maxI);
 compressedSignalQuadrature = signalCompression2(SignalQuadrature,...
@@ -23,7 +18,7 @@ compressedSignalQuadrature = signalCompression2(SignalQuadrature,...
 compressedSignal = round([compressedSignalPhase;compressedSignalQuadrature],5);
 tmwaveformC = compressedSignalPhase + 1i * compressedSignalQuadrature;
 
-error = EVM(tmwaveform2,tmwaveformC,plots);
+error = EVM(signal,tmwaveformC,plots);
 
 %% Plots
 
@@ -35,8 +30,6 @@ if(plots)
     xlabel('Phase')
     ylabel('Quadrature')
     title('Constellation')
-    
-    plotSignal(signal)
     
     figure
     plot(intervalAmplitudeVector,'x')
@@ -62,7 +55,7 @@ if(plots)
     xlabel('Phase')
     
     ErrorAccumulated(compressedSignalPhase,compressedSignalQuadrature...
-        ,intervalVector,tmwaveformC,tmwaveform2,VectorIntervals,VectorIntervals)
+        ,intervalVector,tmwaveformC,signal,VectorIntervals,VectorIntervals)
     
 end
 

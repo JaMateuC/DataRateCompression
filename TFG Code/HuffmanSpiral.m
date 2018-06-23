@@ -3,26 +3,16 @@ avglen = 0;
 signalSize = 0;
 maxI = numV*2*pi;
 
-% intervalAngle = maxI/(round(numBits/2)-1);
 intervalAngle = maxI/(numBits-1);
 intervalAngle = 0:intervalAngle:maxI;
 intervalRadius = 1/(numV*2*pi) * intervalAngle;
-% numBits2 = numBits - length(intervalAngle);
-% intervalAngle2 = -intervalAngle(1:numBits2);
-% intervalAngle = [flip(intervalAngle2),intervalAngle];
-% intervalRadius2 = -intervalRadius(1:numBits2);
-% intervalRadius = [flip(intervalRadius2),intervalRadius];
  
 pointsQuant = intervalRadius.*cos(intervalAngle) + 1i * intervalRadius.*sin(intervalAngle);
-% pointsQuant2 = -pointsQuant(1:numBits2);
-% pointsQuant = [flip(pointsQuant2),pointsQuant];
 
-tmwaveform2 = normalization(signal);
-
-minDAll = abs(tmwaveform2-pointsQuant);
+minDAll = abs(signal-pointsQuant);
 [~,minInd] = min(minDAll,[],2);
 tmwaveformC = pointsQuant(minInd).';
-error = EVM(tmwaveform2,tmwaveformC,plots);
+error = EVM(signal,tmwaveformC,plots);
 if(plots)
     
     figure

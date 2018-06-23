@@ -6,11 +6,9 @@ signalSize = 0;
 maxR = .65;
 maxA = 2*pi;
 startSig = zeros(length(signal),1);
+startSig(1) = signal(1);
 
-tmwaveform2 = normalization(signal);
-startSig(1) = tmwaveform2(1);
-
-TreuValuesVecIndx = 1:trueValue:length(tmwaveform2)-trueValue;
+TreuValuesVecIndx = 1:trueValue:length(signal)-trueValue;
 
 intervalRad = 2*maxR/(numValuesRad-1);
 intervalRadVector = [-maxR:intervalRad:maxR]';
@@ -23,13 +21,13 @@ VectorIntervalsAng = intervalVariable(intervalAngVector);
 VectorIntervalsAng(end,2) = maxA - VectorIntervalsAng(end,1);
 intervalVector = intervalVectorFun(VectorIntervalsRad,VectorIntervalsAng);
 
-for i=1:length(tmwaveform2)-1
+for i=1:length(signal)-1
     
     if(sum(TreuValuesVecIndx == (i+1)))
-        startSig(i+1) = tmwaveform2(i+1);
+        startSig(i+1) = signal(i+1);
     else
-        diffR = abs(tmwaveform2(i+1)) - abs(startSig(i));
-        diffA = atan2(imag(startSig(i)),real(startSig(i))) - atan2(imag(tmwaveform2(i+1)),real(tmwaveform2(i+1)));
+        diffR = abs(signal(i+1)) - abs(startSig(i));
+        diffA = atan2(imag(startSig(i)),real(startSig(i))) - atan2(imag(signal(i+1)),real(signal(i+1)));
         diffA = 2*pi*(diffA < 0) + diffA; 
         [~,indxR] = min(abs(diffR-intervalRadVector));
         [~,indxA] = min(abs(diffA-intervalAngVector));
@@ -46,7 +44,7 @@ distanceAngle = atan2(imag(startSig(1:end-1)),real(startSig(1:end-1))) - atan2(i
 
 tmwaveformC = round(startSig,5);
 
-error = EVM(tmwaveform2,tmwaveformC,plots);
+error = EVM(signal,tmwaveformC,plots);
 
 if(plots)
     
@@ -83,10 +81,10 @@ if(plots)
     
     vectorSectionSize = ones(numValues,1)*(numValues);    
     
-    minDAll = abs(tmwaveform2-intervalVectorTog');
+    minDAll = abs(signal-intervalVectorTog');
     [~,minInd] = min(minDAll,[],2);
     
-    errorsVector = [abs(tmwaveformC - tmwaveform2),minInd];
+    errorsVector = [abs(tmwaveformC - signal),minInd];
     errorsHist = zeros(length(intervalVectorTog),1);
     for i=1:length(intervalVectorTog)
         errorsHist(i) = sum(errorsVector(errorsVector(:,2) == i));

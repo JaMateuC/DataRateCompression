@@ -4,18 +4,14 @@ signalSize = 0;
 maxI = numV*2*pi;
 sens = 10000;
 
-
 intervalAngle = maxI/(sens-1);
 intervalAngle = 0:intervalAngle:maxI;
 intervalRadius = 1/(numV*2*pi) * intervalAngle;
  
 pointsQuant = intervalRadius.*cos(intervalAngle) + 1i * intervalRadius.*sin(intervalAngle);
 
-tmwaveform2 = normalization(signal);
-
-minDAll = abs(tmwaveform2-pointsQuant);
+minDAll = abs(signal-pointsQuant);
 [~,minInd] = min(minDAll,[],2);
-tmwaveformC = pointsQuant(minInd).';
 
 numSamplesInt = round(length(signal)/numBits);
 AccSamp = histcounts(minInd,sens);
@@ -35,13 +31,13 @@ end
 newQuant = pointsQuant(interv);
 newQuant = (newQuant(1:end-1)+newQuant(2:end))/2;
 
-minDAll = abs(tmwaveform2-newQuant);
+minDAll = abs(signal-newQuant);
 [~,minInd] = min(minDAll,[],2);
 tmwaveformCFit = newQuant(minInd).';
 AccSamp = histcounts(minInd,numBits);
 newLen = length(newQuant);
 
-error = EVM(tmwaveform2,tmwaveformCFit,plots);
+error = EVM(signal,tmwaveformCFit,plots);
 
 if(plots)
     

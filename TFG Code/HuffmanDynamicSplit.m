@@ -7,14 +7,13 @@ maxI = .7;
 startSigP = zeros(length(signal),1);
 startSigQ = zeros(length(signal),1);
 
-tmwaveform2 = normalization(signal);
-startSigP(1) = real(tmwaveform2(1));
-startSigQ(1) = imag(tmwaveform2(1));
+startSigP(1) = real(signal(1));
+startSigQ(1) = imag(signal(1));
 
-distanceReal = real(tmwaveform2(1:end-1))-real(tmwaveform2(2:end));
-distanceImag = imag(tmwaveform2(1:end-1))-imag(tmwaveform2(2:end));
+distanceReal = real(signal(1:end-1))-real(signal(2:end));
+distanceImag = imag(signal(1:end-1))-imag(signal(2:end));
 
-TreuValuesVecIndx = 1:trueValue:length(tmwaveform2)-trueValue;
+TreuValuesVecIndx = 1:trueValue:length(signal)-trueValue;
 
 intervalAmplitude = 2*maxI/(numValues-1);
 intervalAmplitudeVector = [-maxI + intervalAmplitude/2:intervalAmplitude:...
@@ -29,11 +28,11 @@ j = 1;
 for i=1:length(distanceImag)
     
     if(sum(TreuValuesVecIndx == (i+1)))
-        startSigP(i+1) = real(tmwaveform2(i+1));
-        startSigQ(i+1) = imag(tmwaveform2(i+1));
+        startSigP(i+1) = real(signal(i+1));
+        startSigQ(i+1) = imag(signal(i+1));
     else
-        diffP = real(tmwaveform2(i+1)) - startSigP(i);
-        diffQ = imag(tmwaveform2(i+1)) - startSigQ(i);
+        diffP = real(signal(i+1)) - startSigP(i);
+        diffQ = imag(signal(i+1)) - startSigQ(i);
         [~,indxP] = min(abs(diffP-const));
         [~,indxQ] = min(abs(diffQ-const));
         compressedDistanceSignalPhase(j) = const(indxP);
@@ -48,7 +47,7 @@ end
 compressedDistanceSignal = round([compressedDistanceSignalPhase';compressedDistanceSignalQuadrature'],5);
 tmwaveformC = startSigP + 1i * startSigQ;
 
-error = EVM(tmwaveform2,tmwaveformC,plots);
+error = EVM(signal,tmwaveformC,plots);
 
 if(plots)
     
@@ -85,10 +84,10 @@ if(plots)
     
     vectorSectionSize = ones(numValues,1)*(numValues);    
     
-    minDAll = abs(tmwaveform2-intervalVectorTog');
+    minDAll = abs(signal-intervalVectorTog');
     [~,minInd] = min(minDAll,[],2);
     
-    errorsVector = [abs(tmwaveformC - tmwaveform2),minInd];
+    errorsVector = [abs(tmwaveformC - signal),minInd];
     errorsHist = zeros(length(intervalVectorTog),1);
     for i=1:length(intervalVectorTog)
         errorsHist(i) = sum(errorsVector(errorsVector(:,2) == i));
