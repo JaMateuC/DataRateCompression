@@ -24,7 +24,7 @@ end
 
 minBits = min(bitsMatrix(errorC <= errorMax));
 [row,column] = find(bitsMatrix == minBits & errorC <= errorMax);
-[eee,aaa,sss] = HuffmanIQTogether(stdSignal,row,column,true,true);
+[eee,aaa,sss] = HuffmanIQTogether(stdSignal,row,column,false,true);
 bestConf = {'Error','Num. Bits','Num Values','Wasted Values','Phase Values','Quadrature Values','DictUsage','Avg. len','Size Signal';...
     eee,log2(exponent(row,column)),bitsMatrix(row,column),...
     wastedBits(row,column),row,column,dictUsage(row,column),aaa,sss};

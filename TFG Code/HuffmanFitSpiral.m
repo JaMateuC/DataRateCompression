@@ -62,12 +62,6 @@ if(plots)
     title('Samples acumulated on each value')
     xlabel('Interval')
     ylabel('Samples acumulated')
-
-    figure
-    plot(minDAll(minInd))
-    title('Error of each sample')
-    xlabel('Sample')
-    ylabel('Euclidean error distance')
     
     figure
     plot(tmwaveformCFit, 'x')
@@ -75,11 +69,27 @@ if(plots)
     xlabel('Phase')
     ylabel('Quadrature')
     axis([-1 1 -1 1])
+    
+    vectorSectionSize = ones(length(newQuant),1);
+    errorsVector = [abs(tmwaveformCFit - signal),minInd];
+    errorsHist = zeros(length(newQuant),1);
+
+    for i=1:length(newQuant)
+        errorsHist(i) = sum(errorsVector(errorsVector(:,2) == i));
+    end
+    errorsHistCell = mat2cell(errorsHist',1,vectorSectionSize');
+    errorsHistTotal = cellfun(@(x) sum(x)/sum(errorsHist)*100,errorsHistCell);
+    figure
+    bar(errorsHistTotal)
+    title('Error acumulation on each level')
+    ylabel('Error acumulated')
+    xlabel('Interval')
 end
 
 if(huffman)
     
-    AccSamp = histcounts(minInd,newLen);
+    histoEdges = 0.5:newLen+0.5;
+    AccSamp = histcounts(minInd,histoEdges);
     
     probVector = AccSamp./(ones(newLen,1).*length(signal)).';
     [dict,avglen] = huffmandictMod(round(newQuant,5),probVector);

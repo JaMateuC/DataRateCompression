@@ -65,7 +65,7 @@ if(plots)
     
     figure
     bar(modulatedSignalTotal)
-    title('Samples acumulated on each level (Radius intervals)')
+    title('Samples acumulated on each level')
     xlabel('Interval')
     ylabel('Samples acumulated')
 

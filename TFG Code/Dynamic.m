@@ -1,7 +1,8 @@
-tmwaveform = csvread('OriginalSignal.csv');
+%tmwaveform = csvread('../../IFFT_OUTPUT.csv');
+ tmwaveform = csvread('OriginalSignal.csv');
 
-startVal = 10;
-maxVal = 30;
+startVal = 20;
+maxVal = 70;
 startTrueVal = 20;
 errormaxB = 8;
 error = zeros(1,maxVal)+500;

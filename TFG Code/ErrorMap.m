@@ -1,6 +1,7 @@
 % Variables
+%tmwaveform = csvread('../../IFFT_OUTPUT.csv');
+ tmwaveform = csvread('OriginalSignal.csv');
 
-tmwaveform = csvread('OriginalSignal.csv');
 startAng = 10;
 startRadius = 6;
 maxVal = 40;
@@ -29,13 +30,13 @@ end
 minBits = min(bitsMatrix(errorC <= errorMax));
 [row,column] = find(bitsMatrix == minBits & errorC <= errorMax);
 [eee,aaa,sss] = HuffmanPolar(polarSignal,tmwaveform2,row,column,true,true);
-bestConf = {'Error','Num. Bits','Num Values','Wasted Values','Radius Values','Quadrature Values','DictUsage','Avg. len','Size Signal';...
+bestConf = {'Error','Num. Bits','Num Values','Wasted Values','Radius Values','Angles Values','DictUsage','Avg. len','Size Signal';...
     eee,log2(exponent(row,column)),bitsMatrix(row,column),...
     wastedBits(row,column),row,column,dictUsage(row,column),aaa,sss};
 
 %% Fit
 
 [eee,aaa,sss] = HuffmanFitPolar(polarSignal,tmwaveform2,row,column,true,true);
-bestConf2 = {'Error','Num. Bits','Num Values','Wasted Values','Radius Values','Quadrature Values','DictUsage','Avg. len','Size Signal';...
+bestConf2 = {'Error','Num. Bits','Num Values','Wasted Values','Radius Values','Angles Values','DictUsage','Avg. len','Size Signal';...
     eee,log2(exponent(row,column)),bitsMatrix(row,column)-1,...
     wastedBits(row,column)+1,row,column,bitsMatrix(row,column)-1/exponent(row,column)*100,aaa,sss};

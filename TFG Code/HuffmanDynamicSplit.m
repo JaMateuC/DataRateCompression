@@ -44,7 +44,7 @@ for i=1:length(distanceImag)
     
 end
 
-compressedDistanceSignal = round([compressedDistanceSignalPhase';compressedDistanceSignalQuadrature'],5);
+compressedDistanceSignal = round([compressedDistanceSignalPhase';compressedDistanceSignalQuadrature'],6);
 tmwaveformC = startSigP + 1i * startSigQ;
 
 error = EVM(signal,tmwaveformC,plots);
@@ -52,10 +52,16 @@ error = EVM(signal,tmwaveformC,plots);
 if(plots)
     
     figure
-    histogram(distanceReal,200)
-
+    histogram(compressedDistanceSignalPhase,intervalAmplitudeVector')
+    xlabel('Intervals')
+    ylabel('Num. samples')
+    title('Sample difference distribution(Phase)')
+    
     figure
-    histogram(distanceImag,200)
+    histogram(compressedDistanceSignalQuadrature,intervalAmplitudeVector')
+    xlabel('Intervals')
+    ylabel('Num. samples')
+    title('Sample difference distribution(Quadrature)')
     
     figure
     plot(intervalVector(:,1),intervalVector(:,2), 'xr')
@@ -104,8 +110,8 @@ end
 
 if(huffman)
 
-    const = round(const,5);
-    AccSamp = histcounts(compressedDistanceSignal,numValues);
+    const = round(const,6);
+    AccSamp = contOcurrence(const,compressedDistanceSignal);
     
     probVector = AccSamp./(ones(numValues,1).*length(compressedDistanceSignal))';
     [dict,avglen] = huffmandictMod(const',probVector);

@@ -15,7 +15,7 @@ SignalQuadrature = imag(signal);
 compressedSignalPhase = signalCompression2(SignalPhase,VectorIntervals,maxI,-maxI);
 compressedSignalQuadrature = signalCompression2(SignalQuadrature,...
     VectorIntervals,maxI,-maxI);
-compressedSignal = round([compressedSignalPhase;compressedSignalQuadrature],5);
+compressedSignal = round([compressedSignalPhase;compressedSignalQuadrature],6);
 tmwaveformC = compressedSignalPhase + 1i * compressedSignalQuadrature;
 
 error = EVM(signal,tmwaveformC,plots);
@@ -62,8 +62,8 @@ end
 if(huffman)
     
     intervalVector = intervalVectorFun(VectorIntervals,VectorIntervals);
-    intervalVector = round(intervalVector(1:numBits,2),5);
-    AccSamp = histcounts(compressedSignal,numBits);
+    intervalVector = round(intervalVector(1:numBits,2),6);
+    AccSamp = contOcurrence(intervalVector,compressedSignal);
     
     probVector = AccSamp./(ones(numBits,1).*2*length(signal))';
     [dict,avglen] = huffmandictMod(intervalVector',probVector);

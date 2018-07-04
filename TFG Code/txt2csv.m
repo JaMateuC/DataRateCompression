@@ -1,4 +1,4 @@
-file = 'IFFT_OUTPUT ';
+file = 'DUC_OUTPUT';
 
 fileID = fopen(['C:\Users\usuario\Desktop\'  file  '.txt'],'r');
 

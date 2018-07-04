@@ -1,4 +1,7 @@
+% tmwaveform = csvread('../../IFFT_OUTPUT.csv');
 tmwaveform = csvread('OriginalSignal.csv');
+% tmwaveform = csvread('../../DUC_OUTPUT.csv');
+% tmwaveform = tmwaveform(1:30000);
 startVal = 5;
 maxVal = 256;
 errormaxB = 8;
@@ -8,8 +11,9 @@ signalSize = zeros(1,maxVal);
 bitsMatrix = zeros(1,maxVal);
 huffman = false;
 
-tmwaveform2 = normalization(tmwaveform);
-stdSignal = bitStd(tmwaveform2);
+stdSignal = bitStd(tmwaveform);
+stdSignal = normalization(stdSignal);
+plotSignal(stdSignal)
 
 for i=startVal:maxVal
     [error(i),avglen(i),signalSize(i)] = HuffmanSplit(stdSignal,i,false,huffman);
@@ -30,5 +34,3 @@ bestConf = {'Error','Num. Bits','Num Values','Wasted Values','DictUsage','Avg. l
 bestConf2 = {'Error','Num. Bits','Num Values','Wasted Values','DictUsage','Avg. len','Size Signal';...
     eee,log2(exponent(row,column)),bitsMatrix(row,column),...
     wastedBits(row,column),dictUsage(row,column),aaa,sss};
-
-plotSignal(tmwaveform)

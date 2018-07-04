@@ -6,20 +6,25 @@ signalSize = 0;
 maxR = .65;
 maxA = 2*pi;
 startSig = zeros(length(signal),1);
+distanceTotal = zeros(length(signal)-1,2);
 startSig(1) = signal(1);
 
 TreuValuesVecIndx = 1:trueValue:length(signal)-trueValue;
 
 intervalRad = 2*maxR/(numValuesRad-1);
 intervalRadVector = [-maxR:intervalRad:maxR]';
-VectorIntervalsRad = intervalVariable(intervalRadVector);
+intervalRadVector2 = [-maxR + intervalRad/2:intervalRad:maxR - intervalRad/2]';
+VectorIntervalsRad = intervalVariable(intervalRadVector2);
 VectorIntervalsRad(end,2) = maxR - VectorIntervalsRad(end,1);
 
 intervalAng = maxA/(numValuesAng-1);
 intervalAngVector = [0:intervalAng:maxA]';
-VectorIntervalsAng = intervalVariable(intervalAngVector);
+intervalAngVector2 = [intervalAng/2:intervalAng:maxA - intervalAng/2]';
+VectorIntervalsAng = intervalVariable(intervalAngVector2);
 VectorIntervalsAng(end,2) = maxA - VectorIntervalsAng(end,1);
+
 intervalVector = intervalVectorFun(VectorIntervalsRad,VectorIntervalsAng);
+intervalVector = round(intervalVector,6);
 
 for i=1:length(signal)-1
     
@@ -35,6 +40,7 @@ for i=1:length(signal)-1
         SRad = abs(startSig(i)) + intervalRadVector(indxR);
         SAng = SAng - 2*pi*(SAng >= 2*pi);
         startSig(i+1) = SRad * cos(SAng) + 1i * SRad * sin(SAng);
+        distanceTotal(i,:) = round([intervalRadVector(indxR),intervalAngVector(indxA)],6);
     end
     
 end
@@ -42,7 +48,8 @@ end
 distancePolar = abs(startSig(1:end-1))-abs(startSig(2:end));
 distanceAngle = atan2(imag(startSig(1:end-1)),real(startSig(1:end-1))) - atan2(imag(startSig(2:end)),real(startSig(2:end)));
 
-tmwaveformC = round(startSig,5);
+
+tmwaveformC = round(startSig,6);
 
 error = EVM(signal,tmwaveformC,plots);
 
@@ -60,16 +67,11 @@ if(plots)
     ylabel('Quadrature')
     title('Constellation')
     figure
-    voronoi(intervalRadVector,intervalAngVector)
+    voronoi(intervalVector(:,1),intervalVector(:,2))
     title('Constellation')
-    xlabel('Phase')
-    ylabel('Quadrature')
+    xlabel('Angles(rad)')
+    ylabel('Radius')
     grid on
-    
-    figure
-    plot(intervalAmplitudeVector,'x')
-    title('Levels Assigment')
-    ylabel('Interval')
     
     figure
     plot(tmwaveformC, 'x')
@@ -79,7 +81,7 @@ if(plots)
     
     intervalVectorTog = intervalVector(:,1) + 1i * intervalVector(:,2);
     
-    vectorSectionSize = ones(numValues,1)*(numValues);    
+    vectorSectionSize = ones(numValuesAng,1)*(numValuesRad);    
     
     minDAll = abs(signal-intervalVectorTog');
     [~,minInd] = min(minDAll,[],2);
@@ -99,13 +101,13 @@ if(plots)
     
 end
 
-if(huffman)
-    intervalVector = intervalVectorFun(VectorIntervals,VectorIntervals);
-    intervalVector = round(intervalVector(1:numValues,2),5);
-    AccSamp = histcounts(compressedDistanceSignal,numValues);
+if(huffman)    
+
+    modulatedSignal = signalModulation(distanceTotal,intervalVector);
+    AccSamp = contOcurrence(1:length(intervalVector),modulatedSignal);
     
-    probVector = AccSamp./(ones(numValues,1).*length(compressedDistanceSignal))';
-    [dict,avglen] = huffmandictMod(intervalVector',probVector);
-    [comp] = huffmanencoMod(compressedDistanceSignal,dict,intervalVector);
+    probVector = AccSamp./(ones(length(intervalVector),1).*length(distanceTotal))';
+    [dict,avglen] = huffmandictMod(0:length(intervalVector)-1,probVector);
+    [comp] = huffmanencoMod(modulatedSignal,dict,1:length(intervalVector));
     signalSize = length(comp);
 end
