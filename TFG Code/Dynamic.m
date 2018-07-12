@@ -1,19 +1,20 @@
-%tmwaveform = csvread('../../IFFT_OUTPUT.csv');
- tmwaveform = csvread('OriginalSignal.csv');
+% tmwaveform = csvread('../../IFFT_OUTPUT.csv');
+%  tmwaveform = csvread('OriginalSignal.csv');
+tmwaveform = csvread('../../DUC_OUTPUT.csv');
 
-startVal = 20;
-maxVal = 70;
+startVal = 10;
+maxVal = 120;
 startTrueVal = 20;
 errormaxB = 8;
 error = zeros(1,maxVal)+500;
 avglen = zeros(1,maxVal);
 signalSize = zeros(1,maxVal);
 bitsMatrix = zeros(1,maxVal);
-huffman = false;
+huffman = true;
 trueValueInterv = 0;
 
-tmwaveform2 = normalization(tmwaveform);
-stdSignal = bitStd(tmwaveform2);
+stdSignal = normalization(tmwaveform);
+% stdSignal = bitStd(tmwaveform2);
 
 for i=startVal:maxVal
     [error(i),avglen(i),signalSize(i)] = HuffmanDynamicSplit(stdSignal,i,trueValueInterv,false,huffman);

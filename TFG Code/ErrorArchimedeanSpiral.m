@@ -1,3 +1,4 @@
+% tmwaveform = csvread('../../IFFT_OUTPUT.csv'); 
 tmwaveform = csvread('OriginalSignal.csv');
 startVal = 350;
 maxVal = 400;
@@ -25,12 +26,12 @@ end
 minBits = min(bitsMatrix(errorC <= errormaxB));
 [row,column] = find(bitsMatrix == minBits & errorC <= errormaxB);
 [eee,aaa,sss] = HuffmanSpiral(stdSignal,row,column,true,true);
-bestConf = {'Error','Num. Bits','Num Values','Wasted Values','DictUsage','Avg. len','Size Signal';...
+bestConf = {'Error','Num. Bits','Num Values','Wasted Values','Num. Spins','DictUsage','Avg. len','Size Signal';...
     eee,log2(exponent(row,column)),bitsMatrix(row,column),...
-    wastedBits(row,column),dictUsage(row,column),aaa,sss};
+    wastedBits(row,column),column,dictUsage(row,column),aaa,sss};
 
 %% Quant fit
-[eee,aaa,sss,newLen] = HuffmanFitSpiral(stdSignal,row,column,true,true);
-bestConf2 = {'Error','Num. Bits','Num Values','Wasted Values','DictUsage','Avg. len','Size Signal';...
-    eee,log2(exponent(newLen,column)),newLen,...
-    wastedBits(newLen,column),dictUsage(newLen,column),aaa,sss};
+% [eee,aaa,sss,newLen] = HuffmanFitSpiral(stdSignal,row,column,true,true);
+% bestConf2 = {'Error','Num. Bits','Num Values','Wasted Values','Num. Spins','DictUsage','Avg. len','Size Signal';...
+%     eee,log2(exponent(newLen,column)),newLen,...
+%     wastedBits(newLen,column),column,dictUsage(newLen,column),aaa,sss};

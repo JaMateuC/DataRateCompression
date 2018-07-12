@@ -1,7 +1,7 @@
 function [error,avglen,signalSize] = HuffmanDynamicPolar(signal,numValuesAng,numValuesRad,trueValue,plots,huffman)
 
-avglen=0;
-signalSize = 0;
+avglen=ceil(log2(numValuesAng * numValuesRad));
+signalSize = avglen*length(signal);
 
 maxR = .65;
 maxA = 2*pi;
@@ -11,9 +11,9 @@ startSig(1) = signal(1);
 
 TreuValuesVecIndx = 1:trueValue:length(signal)-trueValue;
 
-intervalRad = 2*maxR/(numValuesRad-1);
-intervalRadVector = [-maxR:intervalRad:maxR]';
-intervalRadVector2 = [-maxR + intervalRad/2:intervalRad:maxR - intervalRad/2]';
+intervalRad = maxR/(numValuesRad-1);
+intervalRadVector = [0:intervalRad:maxR]';
+intervalRadVector2 = [0 + intervalRad/2:intervalRad:maxR - intervalRad/2]';
 VectorIntervalsRad = intervalVariable(intervalRadVector2);
 VectorIntervalsRad(end,2) = maxR - VectorIntervalsRad(end,1);
 
@@ -31,15 +31,15 @@ for i=1:length(signal)-1
     if(sum(TreuValuesVecIndx == (i+1)))
         startSig(i+1) = signal(i+1);
     else
-        diffR = abs(signal(i+1)) - abs(startSig(i));
-        diffA = atan2(imag(startSig(i)),real(startSig(i))) - atan2(imag(signal(i+1)),real(signal(i+1)));
+        diffR = abs(signal(i+1) - startSig(i));
+        diffA = atan2(imag(signal(i+1) - startSig(i)),real(signal(i+1) - startSig(i)));
         diffA = 2*pi*(diffA < 0) + diffA; 
         [~,indxR] = min(abs(diffR-intervalRadVector));
         [~,indxA] = min(abs(diffA-intervalAngVector));
-        SAng = atan2(imag(startSig(i)),real(startSig(i))) - intervalAngVector(indxA);
-        SRad = abs(startSig(i)) + intervalRadVector(indxR);
+        SAng = intervalAngVector(indxA);
+        SRad = intervalRadVector(indxR);
         SAng = SAng - 2*pi*(SAng >= 2*pi);
-        startSig(i+1) = SRad * cos(SAng) + 1i * SRad * sin(SAng);
+        startSig(i+1) = startSig(i) + (SRad * cos(SAng) + 1i * SRad * sin(SAng));
         distanceTotal(i,:) = round([intervalRadVector(indxR),intervalAngVector(indxA)],6);
     end
     
@@ -56,21 +56,27 @@ error = EVM(signal,tmwaveformC,plots);
 if(plots)
     
     figure
-    histogram(distancePolar,100)
+    histogram(distancePolar,intervalRadVector)
+    xlabel('Intervals')
+    ylabel('Num. samples')
+    title('Sample difference distribution(Radius)')
     
     figure
-    histogram(distanceAngle,100)
+    histogram(distanceAngle,intervalAngVector)
+    xlabel('Intervals [radiants]')
+    ylabel('Num. samples')
+    title('Sample difference distribution(Angles)')
     
     figure
     plot(intervalVector(:,1),intervalVector(:,2), 'xr')
-    xlabel('Phase')
-    ylabel('Quadrature')
     title('Constellation')
+    ylabel('Angles(rad)')
+    xlabel('Radius')
     figure
     voronoi(intervalVector(:,1),intervalVector(:,2))
     title('Constellation')
-    xlabel('Angles(rad)')
-    ylabel('Radius')
+    ylabel('Angles(rad)')
+    xlabel('Radius')
     grid on
     
     figure
@@ -81,7 +87,7 @@ if(plots)
     
     intervalVectorTog = intervalVector(:,1) + 1i * intervalVector(:,2);
     
-    vectorSectionSize = ones(numValuesAng,1)*(numValuesRad);    
+    vectorSectionSize = ones(numValuesRad,1)*(numValuesAng);    
     
     minDAll = abs(signal-intervalVectorTog');
     [~,minInd] = min(minDAll,[],2);

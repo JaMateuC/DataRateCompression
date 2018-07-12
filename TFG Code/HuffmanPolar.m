@@ -1,6 +1,6 @@
 function [error,avglen,signalSize] = HuffmanPolar(polarSignal,normSignal,numRadius,numAngles,plots,huffman)
 avglen = 0;
-signalSize = 0;
+signalSize = avglen*length(signal);
 
 % polar signal
 maxR = 2*pi;

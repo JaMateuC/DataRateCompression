@@ -1,8 +1,8 @@
-function [error,avglen,signalSize] = HuffmanFitSplit(signal,numBits,plots,huffman)
-avglen = 0;
-signalSize = 0;
+function [error,avglen,signalSize] = HuffmanFitSplit(signal,numValues,plots,huffman)
+avglen = ceil(log2(numValues));
+signalSize = avglen*length(signal)*2;
 
-numSamplesInt = ceil(2*length(signal)/numBits);
+numSamplesInt = ceil(2*length(signal)/numValues);
 tmw = [real(signal);imag(signal)];
 distancesSamples = sort(real(tmw));
 pointsImp = distancesSamples(1:numSamplesInt:end);
@@ -56,7 +56,7 @@ if(plots)
     ylabel('Quadrature')
     xlabel('Phase')
     
-    vectorSectionSize = ones(numBits,1)*numBits;
+    vectorSectionSize = ones(numValues,1)*numValues;
     
     errorsVector = [abs(tmwaveformC - signal),minInd];
     errorsHist = zeros(length(constellation),1);
@@ -80,10 +80,10 @@ if(huffman)
     [~,minInd] = min(minDAll,[],2);
     tmwTotal = pointsImp(minInd)'.';
     
-    histoEdges = 0.5:numBits+0.5;
+    histoEdges = 0.5:numValues+0.5;
     AccSamp = histcounts(minInd,histoEdges);
     
-    probVector = AccSamp./(ones(numBits,1).*2*length(signal))';
+    probVector = AccSamp./(ones(numValues,1).*2*length(signal))';
     [dict,avglen] = huffmandictMod(round(pointsImp,5)',probVector);
     comp = huffmanencoMod(round(tmwTotal,5),dict,round(pointsImp,5));
     signalSize = length(comp);

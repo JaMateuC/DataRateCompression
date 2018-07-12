@@ -1,6 +1,7 @@
-tmwaveform = csvread('OriginalSignal.csv');
+% tmwaveform = csvread('OriginalSignal.csv');
+tmwaveform = csvread('../../IFFT_OUTPUT.csv'); 
 
-maxVal = 40;
+maxVal = 70;
 errorMax = 8;
 error = zeros(maxVal);
 avglen = zeros(maxVal);
@@ -9,6 +10,7 @@ bitsMatrix = zeros(maxVal);
 startP = 10;
 startQ = 10;
 huffman = false;
+fit = false;
 
 tmwaveform2 = normalization(tmwaveform);
 stdSignal = bitStd(tmwaveform2);
@@ -30,8 +32,9 @@ bestConf = {'Error','Num. Bits','Num Values','Wasted Values','Phase Values','Qua
     wastedBits(row,column),row,column,dictUsage(row,column),aaa,sss};
 
 %% Fit
-
-[eee,aaa,sss] = HuffmanFitIQTogether(stdSignal,row,column,true,true);
-bestConf2 = {'Error','Num. Bits','Num Values','Wasted Values','Phase Values','Quadrature Values','DictUsage','Avg. len','Size Signal';...
-    eee,log2(exponent(row,column)),bitsMatrix(row,column),...
-    wastedBits(row,column),row,column,dictUsage(row,column),aaa,sss};
+if(fit)
+    [eee,aaa,sss] = HuffmanFitIQTogether(stdSignal,row,column,true,true);
+    bestConf2 = {'Error','Num. Bits','Num Values','Wasted Values','Phase Values','Quadrature Values','DictUsage','Avg. len','Size Signal';...
+        eee,log2(exponent(row,column)),bitsMatrix(row,column),...
+        wastedBits(row,column),row,column,dictUsage(row,column),aaa,sss};
+end

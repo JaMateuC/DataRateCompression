@@ -1,6 +1,6 @@
 function [error,avglen,signalSize] = HuffmanIQTogether(signal,numPhase,numQuadrature,plots,huffman)
-avglen = 0;
-signalSize = 0;
+avglen = ceil(log2(numPhase*numQuadrature));
+signalSize = avglen*length(signal);
 
 intervalPhase = 2/(numPhase-1);
 intervalPhaseVector = [-1 + intervalPhase/2:intervalPhase:1-intervalPhase/2]';

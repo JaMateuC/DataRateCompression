@@ -1,11 +1,11 @@
-function [error,avglen,signalSize] = HuffmanSpiral(signal,numBits,numV,plots,huffman)
-avglen = 0;
-signalSize = 0;
-maxI = numV*2*pi;
+function [error,avglen,signalSize] = HuffmanSpiral(signal,numValues,numLoops,plots,huffman)
+avglen = ceil(log2(numValues));
+signalSize = avglen*length(signal);
+maxI = numLoops*2*pi;
 
-intervalAngle = maxI/(numBits-1);
+intervalAngle = maxI/(numValues-1);
 intervalAngle = 0:intervalAngle:maxI;
-intervalRadius = 1/(numV*2*pi) * intervalAngle;
+intervalRadius = 1/(numLoops*2*pi) * intervalAngle;
  
 pointsQuant = intervalRadius.*cos(intervalAngle) + 1i * intervalRadius.*sin(intervalAngle);
 
@@ -31,7 +31,7 @@ if(plots)
     grid on
     axis([-1 1 -1 1])
     
-    AccSamp = histcounts(minInd,numBits);
+    AccSamp = histcounts(minInd,numValues);
     
     figure
     bar(AccSamp)
@@ -63,10 +63,10 @@ if(plots)
 end
 if(huffman)
     
-    histoEdges = 0.5:numBits+0.5;
+    histoEdges = 0.5:numValues+0.5;
     AccSamp = histcounts(minInd,histoEdges);
     
-    probVector = AccSamp./(ones(numBits,1).*length(signal)).';
+    probVector = AccSamp./(ones(numValues,1).*length(signal)).';
     [dict,avglen] = huffmandictMod(pointsQuant,probVector);
     comp = huffmanencoMod(tmwaveformC,dict,pointsQuant.');
     signalSize = length(comp);

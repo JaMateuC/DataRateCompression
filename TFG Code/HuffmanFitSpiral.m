@@ -1,24 +1,24 @@
-function [error,avglen,signalSize,newLen] = HuffmanFitSpiral(signal,numBits,numV,plots,huffman)
-avglen = 0;
-signalSize = 0;
-maxI = numV*2*pi;
+function [error,avglen,signalSize,newLen] = HuffmanFitSpiral(signal,numValues,numLoops,plots,huffman)
+avglen = ceil(log2(numValues));
+signalSize = avglen*length(signal);
+maxI = numLoops*2*pi;
 sens = 10000;
 
 intervalAngle = maxI/(sens-1);
 intervalAngle = 0:intervalAngle:maxI;
-intervalRadius = 1/(numV*2*pi) * intervalAngle;
+intervalRadius = 1/(numLoops*2*pi) * intervalAngle;
  
 pointsQuant = intervalRadius.*cos(intervalAngle) + 1i * intervalRadius.*sin(intervalAngle);
 
 minDAll = abs(signal-pointsQuant);
 [~,minInd] = min(minDAll,[],2);
 
-numSamplesInt = round(length(signal)/numBits);
+numSamplesInt = round(length(signal)/numValues);
 AccSamp = histcounts(minInd,sens);
 interv = 1;
 j = 1;
 z = 2;
-while(z <= numBits && j <= sens)
+while(z <= numValues && j <= sens)
     count = 0;
     while(count < numSamplesInt && j <= sens)
         count = count + AccSamp(j);
@@ -34,7 +34,7 @@ newQuant = (newQuant(1:end-1)+newQuant(2:end))/2;
 minDAll = abs(signal-newQuant);
 [~,minInd] = min(minDAll,[],2);
 tmwaveformCFit = newQuant(minInd).';
-AccSamp = histcounts(minInd,numBits);
+AccSamp = histcounts(minInd,numValues);
 newLen = length(newQuant);
 
 error = EVM(signal,tmwaveformCFit,plots);

@@ -1,6 +1,6 @@
 function [error,avglen,signalSize] = HuffmanFitIQTogether(signal,numPhase,numQuadrature,plots,huffman)
-avglen = 0;
-signalSize = 0;
+avglen = ceil(log2(numPhase*numQuadrature));
+signalSize = avglen*length(signal);
 
 numSamplesInt = ceil(length(signal)/(numPhase));
 distancesSamples = sort(real(signal));

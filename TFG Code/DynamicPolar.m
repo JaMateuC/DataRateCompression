@@ -8,7 +8,7 @@ error = zeros(maxVal);
 avglen = zeros(maxVal);
 signalSize = zeros(maxVal);
 bitsMatrix = zeros(maxVal);
-huffman = true;
+huffman = false;
 
 tmwaveform2 = normalization(tmwaveform);
 stdSignal = bitStd(tmwaveform2);

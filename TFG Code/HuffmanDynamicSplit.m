@@ -1,9 +1,9 @@
 function [error,avglen,signalSize] = HuffmanDynamicSplit(signal,numValues,trueValue,plots,huffman)
 
-avglen = 0;
-signalSize = 0;
+avglen = ceil(log2(numValues));
+signalSize = avglen*2*length(signal);
 
-maxI = .7;
+maxI = .57;
 startSigP = zeros(length(signal),1);
 startSigQ = zeros(length(signal),1);
 
@@ -44,8 +44,16 @@ for i=1:length(distanceImag)
     
 end
 
-compressedDistanceSignal = round([compressedDistanceSignalPhase';compressedDistanceSignalQuadrature'],6);
-tmwaveformC = startSigP + 1i * startSigQ;
+if(sum(real(signal)) == 0)
+    compressedDistanceSignal = round(compressedDistanceSignalQuadrature',6);
+    tmwaveformC = startSigP .* 0 + 1i * startSigQ;
+elseif(sum(imag(signal)) == 0)
+    compressedDistanceSignal = round(compressedDistanceSignalPhase',6);
+    tmwaveformC = startSigP + 1i * startSigQ .* 0;
+else
+    compressedDistanceSignal = round([compressedDistanceSignalPhase';compressedDistanceSignalQuadrature'],6);
+    tmwaveformC = startSigP + 1i * startSigQ;
+end
 
 error = EVM(signal,tmwaveformC,plots);
 
@@ -90,8 +98,14 @@ if(plots)
     
     vectorSectionSize = ones(numValues,1)*(numValues);    
     
-    minDAll = abs(signal-intervalVectorTog');
+    minDAll = abs(signal(1:10000)-intervalVectorTog');
     [~,minInd] = min(minDAll,[],2);
+    
+    for i=10001:1:length(signal)
+    minDAll = abs(signal(i)-intervalVectorTog');
+    [~,temp] = min(minDAll,[],2);
+    minInd(i) = temp;
+    end
     
     errorsVector = [abs(tmwaveformC - signal),minInd];
     errorsHist = zeros(length(intervalVectorTog),1);
@@ -117,4 +131,5 @@ if(huffman)
     [dict,avglen] = huffmandictMod(const',probVector);
     [comp] = huffmanencoMod(compressedDistanceSignal,dict,const);
     signalSize = length(comp);
+    
 end
